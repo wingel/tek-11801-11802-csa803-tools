@@ -67,8 +67,8 @@ It will then simulate keypresses over RS232 which tells the scope to
 extract data from the different memories and print it to the screen,
 that is RS232, and parse the results and dump it to file.
 
-The extraction process is slow and will take hours to finish.  Be
-patient.
+The extraction process is slow and will take about 12 hours to finish.
+Be patient
 
 When the process is finished a directory wit EPROM and NVRAM images
 for the mainframe will have been created.  The name of the directory
@@ -381,7 +381,30 @@ a file.
 * Select "(X) Exit" to exit the test.  Repeat the processes for the
 sampling modules in other slots.
 
-## Memories (EPROM and NVRAM)
+### Sampling head EEPROM format
+
+The contents of the sampling head EEPROMs are 128 bytes.
+
+| Addr (hex) | Addr (dec)  | Description                 |
+| ---------: | ----------: | --------------------------- |
+| 0x00..0x6d |      0..109 | Unknown                     |
+| 0x6e..0x75 |    110..117 | Model, e.g. SD-24           |
+| 0x76..0x7d |    118..125 | Serial number. e.g. B020024 |
+| 0x7e..0x7f |    126..127 | Checksum                    |
+
+Strings such as the model and serial number are padded on the right
+with spaces (ASCII 32).
+
+To verify the checksum, convert the image into 64 big endian 16 bit
+words and sum all words.  If the checksum is correct the low 16 bits
+of the sum should be 0.  To update the checksum, calculate the sum of
+the first 63 words, and negate it and take the low 16 bits and place
+them in the last word.  Convert the words back to bytes.
+
+TODO Try to collect multiple modules and compare the contents and
+see if we can figure out the meaning of the unknown data.
+
+## Mainframe memories (EPROM and NVRAM)
 
 There are multiple subsystems in the oscilloscope with multiple memory
 ICs.  Most of the models seem to have the same names for the EPROMs,
@@ -437,10 +460,42 @@ each.  The EPROMs on the other boards are 27C512 with 512kbits or
 
 Each pair of EPROMs are interleaved.  For eample U800 contains even
 bytes and U900 contains odd bytes.  This means that U800/U900 together
-make upp 128kBytes of memory mapped at address FC0000 to FDFFFF.
+make upp 128kBytes of memory mapped from address FC0000 to FDFFFF.
 
 The data from these addresses can be read out using the Low-Level
 Hardware Debugger described below.
+
+### Executive NVRAM
+
+There is a test for the executive NVRAM which looks like this:
+
+```
+Executive  Exec Control       NVRAM      Address/Data
+
+    ROUTINE      INDEX  FAULTS  ADDRES  EXPECT  ACTUAL
+
+a) Battery        pass          3E0002    2152    2152
+b) Data Lines     pass          3E0000    8000    8000
+c) Address/Data   pass          43FFFE    AAAA    AAAA
+```
+
+There is some kind of memory at address 3E000 which contains the
+mainframe serial number and also seems to have a log of messages.  I'm
+assuming that this is the NVRAM and that there is 256kBytes of it
+mapped from address 3E0000 to 3FFFFF.
+
+```
+003e0000  ad de 52 21 ad de 52 21  34 2e 30 34 00 a2 00 00  |..R!..R!4.04....|
+003e0010  80 40 40 00 01 00 c0 18  42 30 32 33 34 35 36 00  |.@@.....B023456.|
+003e0020  00 00 00 00 00 01 00 80  94 02 ae 41 01 00 76 24  |...........A..v$|
+003e0030  00 00 39 08 20 20 20 34  33 20 30 32 2f 32 35 2f  |..9.   43 02/25/|
+003e0040  39 37 20 31 30 3a 35 33  3a 31 33 20 20 33 38 36  |97 10:53:13  386|
+003e0050  20 4d 69 6e 6f 72 20 74  69 6d 65 20 62 61 73 65  | Minor time base|
+003e0060  20 63 61 6c 69 62 72 61  74 69 6f 6e 20 70 72 6f  | calibration pro|
+003e0070  62 6c 65 6d 3a 20 31 36  00 20 20 31 33 31 20 30  |blem: 16.  131 0|
+```
+
+TODO Find out what physical chips on A18 actually store the NVRAM data
 
 ### Display subsystem EPROM
 
@@ -475,7 +530,18 @@ d) U410           pass          0E0001    AB0E    AB0E
 It has two pairs of 27C512 EPROMs which are mapped at C0000 to CFFFF
 and E0000 to EFFFF.
 
-# Acquisition subsystem EPROM
+### Time base NVRAM
+
+The time base board has four 128kbit / 32kByte SRAMs chips.  Two of
+them, U500 and U511, sit in a battery powered socket.  The unpowered
+ones are probably mapped to address 00000 to 0ffff.  The battery
+powered ones are reportedly mapped to address 10000 to 1ffff.
+
+This memory contains some kind of serial number and calibration for
+the time base controller.  There are reports of the time base becoming
+wildly out of spec if the contents if this NVRAM are lost.
+
+### Acquisition subsystem EPROM
 
 Each acquisition board (one on the 11802 and CSA devices, two on the
 11801 models) has a Motorola 6809 processor with 16 bits of address
@@ -496,17 +562,7 @@ address space from 8000 to FFFF is only 32kBytes.  There must be some
 kind of bank switching going on and I'm not sure it it is possible to
 read out the whole EPROM using software.
 
-### Time base NVRAM
-
-The time base board has four 128kbit / 32kByte SRAMs chips.  Two of
-them, U500 and U511, sit in a battery powered socket.  The unpowered
-ones are probably mapped to address 00000 to 0ffff.  The battery
-powered ones are reportedly mapped to address 10000 to 1ffff.
-
-This memory contains some kind of serial number and calibration for
-the time base controller.
-
-# Dumping memory using Low-Level Debugger
+## Dumping memory using Low-Level Debugger
 
 To dump memory one has to use the Low-Level Hardware Debugger.  This can be
 dangerous since the debugging mode can also write to memory.  Be
