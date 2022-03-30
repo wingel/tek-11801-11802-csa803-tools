@@ -460,7 +460,7 @@ each.  The EPROMs on the other boards are 27C512 with 512kbits or
 
 Each pair of EPROMs are interleaved.  For eample U800 contains even
 bytes and U900 contains odd bytes.  This means that U800/U900 together
-make upp 128kBytes of memory mapped from address FC0000 to FDFFFF.
+make upp 256kBytes of memory mapped from address FC0000 to FDFFFF.
 
 The data from these addresses can be read out using the Low-Level
 Hardware Debugger described below.
