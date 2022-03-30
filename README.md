@@ -77,8 +77,8 @@ will be files for each IC with names showing the board name, IC
 identifier, which subsystem it belongs to and the version.  The
 version information is extracted from the "ID?" string.
 
-For example a directory called "TEK-11801B_V81_1" with the following
-contents:
+For example a directory called "TEK-11801B-V81_1-B012345" with the
+following contents:
 
 | Filename                     | Address | Size | Description              |
 | :--------------------------- | ------: | ---: | :----------------------- |
@@ -96,7 +96,7 @@ contents:
 | A18-U820-EXP-4_04.bin        |  F40001 | 128k | Executive                |
 | A18-U830-EXP-4_04.bin        |  F00000 | 128k | Executive                |
 | A18-U930-EXP-4_04.bin        |  F00001 | 128k | Executive                |
-| A28-U611-ACQ1-UPPER-9_02.bin |    8000 |  32k | Acquisition (incomplete) |
+| A28-U611-ACQ1-9_02-UPPER.bin |    8000 |  32k | Acquisition (incomplete) |
 
 Note that the acquisition image is incomplete and only contains the
 upper 32kBytes from the 64kByte EPROM.

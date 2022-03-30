@@ -32,7 +32,7 @@ def screen_cleanup():
     screen_dirty = False
 
 def sanitize_fn(s):
-    return re.sub('[^-_A-Za-z0-9]', '-', s)
+    return re.sub('[^-_A-Za-z0-9]', '_', s)
 
 class Printer():
     def __init__(self, f):
@@ -202,7 +202,7 @@ class Tek():
 
         self.device = parts[0]
 
-        self.main = parts[0].replace('/', '-') + ' ' + parts[1]
+        self.main = parts[0].replace('/', '-') + '-' + parts[1]
 
         self.subsystems = {}
         for part in parts[2:]:
@@ -511,22 +511,22 @@ class Tek():
                     self.dump_mem('a', i * 0x10000, 0x100)
 
             ver = sanitize_fn(self.subsystems.get('ACQM1') or self.subsystems.get('ACQM2') or 'unknown')
-            self.dump_mem('d', 0x8000, 0x8000, 'A28_U611_ACQ_%s_UPPER.bin' % ver, byte_order = '>')
+            self.dump_mem('d', 0x8000, 0x8000, 'A28-U611-ACQ-%s-UPPER.bin' % ver, byte_order = '>')
 
             ver = sanitize_fn(self.subsystems.get('DSY') or 'unknown')
-            self.dump_mem('b', 0xe0000, 0x20000, 'A15_U140_DSY_%s.bin' % ver, 'A15_U150_DSY_%s.bin' % ver)
+            self.dump_mem('b', 0xe0000, 0x20000, 'A15-U140-DSY-%s.bin' % ver, 'A15_U150_DSY_%s.bin' % ver)
 
             ver = sanitize_fn(self.subsystems.get('TBC') or 'unknown')
-            self.dump_mem('c', 0xc0000, 0x20000, 'A5_U300_TBC_%s.bin' % ver, 'A5_U400_TBC_%s.bin' % ver)
-            self.dump_mem('c', 0xe0000, 0x20000, 'A5_U310_TBC_%s.bin' % ver, 'A5_U410_TBC_%s.bin' % ver)
-            self.dump_mem('c', 0x10000, 0x10000, 'A5_U500_TBC_%s.bin' % ver, 'A5_U511_TBC_%s.bin' % ver)
+            self.dump_mem('c', 0xc0000, 0x20000, 'A5-U300-TBC-%s.bin' % ver, 'A5-U400-TBC-%s.bin' % ver)
+            self.dump_mem('c', 0xe0000, 0x20000, 'A5-U310-TBC-%s.bin' % ver, 'A5-U410-TBC-%s.bin' % ver)
+            self.dump_mem('c', 0x10000, 0x10000, 'A5-U500-TBC-%s.bin' % ver, 'A5-U511-TBC-%s.bin' % ver)
 
             ver = sanitize_fn(self.subsystems.get('EXP') or 'unknown')
-            self.dump_mem('a', 0xfc0000, 0x00040000, 'A18_U800_EXP_%s.bin' % ver, 'A18_U900_EXP_%s.bin' % ver)
-            self.dump_mem('a', 0xf80000, 0x00040000, 'A18_U810_EXP_%s.bin' % ver, 'A18_U910_EXP_%s.bin' % ver)
-            self.dump_mem('a', 0xf40000, 0x00040000, 'A18_U820_EXP_%s.bin' % ver, 'A18_U920_EXP_%s.bin' % ver)
-            self.dump_mem('a', 0xf00000, 0x00040000, 'A18_U830_EXP_%s.bin' % ver, 'A18_U930_EXP_%s.bin' % ver)
-            self.dump_mem('a', 0x3e0000, 0x00020000, 'A18_NVRAM_EXP_%s.bin' % ver)
+            self.dump_mem('a', 0xfc0000, 0x00040000, 'A18-U800-EXP-%s.bin' % ver, 'A18-U900-EXP-%s.bin' % ver)
+            self.dump_mem('a', 0xf80000, 0x00040000, 'A18-U810-EXP-%s.bin' % ver, 'A18-U910-EXP-%s.bin' % ver)
+            self.dump_mem('a', 0xf40000, 0x00040000, 'A18-U820-EXP-%s.bin' % ver, 'A18-U920-EXP-%s.bin' % ver)
+            self.dump_mem('a', 0xf00000, 0x00040000, 'A18-U830-EXP-%s.bin' % ver, 'A18-U930-EXP-%s.bin' % ver)
+            self.dump_mem('a', 0x3e0000, 0x00020000, 'A18-NVRAM-EXP-%s.bin' % ver)
 
             # self.dump_mem('a', 0x400000, 0x10000)
             # self.dump_mem('a', 0x410000, 0x10000)
