@@ -493,8 +493,15 @@ class Tek():
             self.enable_debugger()
 
             if 1:
-                for i in range(4):
-                    self.dump_module(i+1)
+                # Should be present on all models
+                if 'ACQM1' in self.subsystems:
+                    self.dump_module(1)
+                    self.dump_module(2)
+
+                # Only present on 11810, not on CSA803 and propbly not on 11802
+                if 'ACQM2' in self.subsystems:
+                    self.dump_module(3)
+                    self.dump_module(4)
 
             if 0:
                 # Dump the first bit of each 64k section to see if we
