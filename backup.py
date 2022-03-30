@@ -15,7 +15,8 @@ from romtool import *
 MAIN_BAUDRATES = [ 9600 ] # , 19200 ]
 
 # Order to try baudrates for test mode
-TEST_BAUDRATES = [ 9600, 38400 ]
+TEST_BAUDRATES = [ 9600, 19200, 38400 ]
+TEST_BAUDRATE = 38400
 
 HOME_PAT = '\033\\[2K'
 
@@ -480,11 +481,11 @@ class Tek():
 
             print("Baudrate %u bps" % b, file = sys.stderr)
 
-            if b != 38400:
-                print("Switching to 38400 bps\n", file = sys.stderr)
-                self.sendline('B38400')
+            if b != TEST_BAUDRATE:
+                print("Switching to TEST_BAUDRATE bps\n", file = sys.stderr)
+                self.sendline('B%u' % TEST_BAUDRATE)
                 time.sleep(0.1)
-                self.set_baudrate(38400)
+                self.set_baudrate(TEST_BAUDRATE)
                 self.send('TT')
                 self.expect('EXTENDED DIAGNOSTICS', save = True)
                 if self.debug >= 2:
